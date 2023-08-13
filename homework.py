@@ -50,7 +50,7 @@ def get_api_answer(timestamp):
     payload = {'from_date': timestamp}
     try:
         response = requests.get(ENDPOINT, headers=HEADERS, params=payload)
-        print(response.json())
+        response.json()
     except requests.exceptions.RequestException as er:
         logging.error(er)
     if response.status_code != 200:
