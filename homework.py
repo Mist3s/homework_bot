@@ -100,26 +100,26 @@ def main():
         homeworks = ''
         try:
             response = get_api_answer(timestamp)
-            check_response(response)
-            print(response)
+            if check_response(response) is None:
+                logging.debug('Новых домашних заданий нету.')
             timestamp = int(response['current_date'])
             for homework in response['homeworks']:
                 if homework != homeworks:
                     homeworks = homework
                     message = parse_status(homework)
-                    print(message)
                     send_message(bot, message)
 
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.error(message)
         finally:
-            time.sleep(2)
+            time.sleep(RETRY_PERIOD)
 
 
 if __name__ == '__main__':
     logging.basicConfig(
-        format='%(asctime)s, %(levelname)s, %(name)s, %(funcName)s, %(lineno)d, %(message)s',
+        format=('%(asctime)s | %(levelname)s | %(name)s | Функция: %(funcName)s '
+                '| Строка: %(lineno)d | %(message)s'),
         level=logging.DEBUG,
         filename=f'{os.getcwd()}/main.log'
     )
