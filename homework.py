@@ -27,6 +27,8 @@ HOMEWORK_VERDICTS = {
 
 
 class HomeWorksException(Exception):
+    """Кастомное исключение для сервиса Практикум.Домашка."""
+
     pass
 
 
@@ -70,9 +72,11 @@ def check_response(response):
     if len(response['homeworks']) < 1:
         return
     if not isinstance(response['homeworks'], list):
-        raise TypeError(f'API вернул значение "homeworks": {type(response["homeworks"])} вместо "list".')
+        raise TypeError(f'API вернул значение "homeworks": '
+                        f'{type(response["homeworks"])} вместо "list".')
     if not isinstance(response['current_date'], int):
-        raise TypeError(f'API вернул значение "current_date": {type(response["current_date"])} вместо "int".')
+        raise TypeError(f'API вернул значение "current_date": '
+                        f'{type(response["current_date"])} вместо "int".')
     return response['homeworks']
 
 
@@ -118,8 +122,8 @@ def main():
 
 if __name__ == '__main__':
     logging.basicConfig(
-        format=('%(asctime)s | %(levelname)s | %(name)s | Функция: %(funcName)s '
-                '| Строка: %(lineno)d | %(message)s'),
+        format=('%(asctime)s | %(levelname)s | %(name)s | '
+                'Функция: %(funcName)s | Строка: %(lineno)d | %(message)s'),
         level=logging.DEBUG,
         filename=f'{os.getcwd()}/main.log'
     )
