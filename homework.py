@@ -9,6 +9,8 @@ from telegram import Bot
 from telegram.error import TelegramError
 from dotenv import load_dotenv
 
+from exceptions import HomeWorksException
+
 load_dotenv()
 
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
@@ -26,17 +28,9 @@ HOMEWORK_VERDICTS = {
 }
 
 
-class HomeWorksException(Exception):
-    """Кастомное исключение для сервиса Практикум.Домашка."""
-
-    pass
-
-
 def check_tokens():
     """Проверяет доступность переменных окружения."""
-    if not all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]):
-        return False
-    return True
+    return all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID])
 
 
 def send_message(bot, message):
@@ -53,12 +47,12 @@ def get_api_answer(timestamp):
     payload = {'from_date': timestamp}
     try:
         response = requests.get(ENDPOINT, headers=HEADERS, params=payload)
-        response.json()
+        if response.status_code != HTTPStatus.OK:
+            raise HomeWorksException(f'Код ответа API: {response.status_code}')
+        return response.json()
     except requests.exceptions.RequestException as er:
-        raise HomeWorksException(er)
-    if response.status_code != HTTPStatus.OK:
-        raise HomeWorksException(f'Код ответа API: {response.status_code}')
-    return response.json()
+        raise HomeWorksException('Ошибка API-сервиса '
+                                 'Практикум.Домашка.') from er
 
 
 def check_response(response):
@@ -69,8 +63,6 @@ def check_response(response):
         raise KeyError('В ответе API нет ключа current_date')
     if 'homeworks' not in response:
         raise KeyError('В ответе API нет ключа homeworks')
-    if len(response['homeworks']) < 1:
-        return
     if not isinstance(response['homeworks'], list):
         raise TypeError(f'API вернул значение "homeworks": '
                         f'{type(response["homeworks"])} вместо "list".')
@@ -104,7 +96,8 @@ def main():
         homeworks = ''
         try:
             response = get_api_answer(timestamp)
-            if check_response(response) is None:
+            check_response(response)
+            if not response['homeworks']:
                 logging.debug('Новых домашних заданий нету.')
             timestamp = int(response['current_date'])
             for homework in response['homeworks']:
