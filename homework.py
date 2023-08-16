@@ -92,8 +92,8 @@ def main():
 
     bot = Bot(token=TELEGRAM_TOKEN)
     timestamp = int(time.time())
+    homeworks = ''
     while True:
-        homeworks = ''
         try:
             response = get_api_answer(timestamp)
             check_response(response)
