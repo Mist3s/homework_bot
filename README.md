@@ -1,2 +1,8 @@
-# homework_bot
-python telegram bot
+# HomeWork Bot
+
+Telegram bot - бот для отслеживания статуса проектов от правленых на проверку и последующем уведомлением в телеграм.
+
+## Об авторе
+Python-разработчик
+
+[Андрей Иванов](https://github.com/Mist3s)
